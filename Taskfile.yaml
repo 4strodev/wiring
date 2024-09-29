@@ -1,0 +1,23 @@
+version: '3'
+
+vars:
+  TMP: tmp
+
+tasks:
+  default:
+    description: List available tasks
+    cmd: task --list-all
+
+  test:
+    description: Execute tests
+    deps:
+      - mktmp
+    cmd: go test ./... -v -cover -coverprofile={{ .TMP }}/coverage.out
+
+  coverage:
+    description: Shows on the browser the test coverage of the project
+    cmd: go tool cover -html={{ .TMP }}/coverage.out
+
+  mktmp:
+    description: Creates default temporary directory for temp files like coverage profile.
+    cmd: mkdir -p {{ .TMP }}

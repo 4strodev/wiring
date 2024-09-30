@@ -5,19 +5,29 @@ vars:
 
 tasks:
   default:
-    description: List available tasks
+    desc: List available tasks
     cmd: task --list-all
 
   test:
-    description: Execute tests
+    desc: Execute tests
     deps:
       - mktmp
     cmd: go test ./... -v -cover -coverprofile={{ .TMP }}/coverage.out
 
   coverage:
-    description: Shows on the browser the test coverage of the project
+    desc: Shows on the browser the test coverage of the project
     cmd: go tool cover -html={{ .TMP }}/coverage.out
 
+  test:coverage:
+    desc: Execute tests and show coverage
+    deps:
+      - test
+      - coverage
+
+  docs:
+    desc: show documentation as it will be rendered in go pkg site. It requires pkgiste to be installed
+    cmd: pkgsite -open .
+
   mktmp:
-    description: Creates default temporary directory for temp files like coverage profile.
+    desc: Creates default temporary directory for temp files like coverage profile.
     cmd: mkdir -p {{ .TMP }}

@@ -1,4 +1,4 @@
-package wiring
+package pkg
 
 import (
 	"reflect"
@@ -6,9 +6,16 @@ import (
 	"github.com/4strodev/wiring/pkg/errors"
 )
 
+type abstractionLifeCycle uint8
+
+const (
+	SINGLETON abstractionLifeCycle = iota
+	TRANSIENT
+)
+
 // dependencySpec defines how the abstraction is resolved
 type dependencySpec struct {
-	container  *WireContainer
+	container  *wireContainer
 	lifeCycle  abstractionLifeCycle
 	resolver   any
 	instance   any
@@ -77,7 +84,7 @@ func (spec *dependencySpec) arguments() ([]reflect.Value, error) {
 	return []reflect.Value{}, nil
 }
 
-func newSpec(resolver any, lifeCycle abstractionLifeCycle, container *WireContainer) (spec dependencySpec, err error) {
+func newSpec(resolver any, lifeCycle abstractionLifeCycle, container *wireContainer) (spec dependencySpec, err error) {
 	spec.lifeCycle = lifeCycle
 	spec.container = container
 

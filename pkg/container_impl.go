@@ -1,5 +1,4 @@
-// contains the wire implementation of interfaces defined on pkg
-package wiring
+package pkg
 
 import (
 	"fmt"
@@ -9,37 +8,20 @@ import (
 	"github.com/4strodev/wiring/pkg/errors"
 )
 
-const WIRE_TAG = "wire"
-
-type Container interface {
-	// Type based injection
-	Singleton(resolver any) error
-	Transient(resolver any) error
-	Resolve(structure any) error
-
-	// Token based injection
-	SingletonToken(token string, resolver any) error
-	TransientToken(token string, resolver any) error
-	ResolveToken(token string, structure any) error
-
-	// Other container utilities
-	Fill(structure any) error
-}
-
-type WireContainer struct {
+type wireContainer struct {
 	typeMapping  map[reflect.Type]dependencySpec
 	tokenMapping map[string]dependencySpec
 }
 
 func New() Container {
-	return &WireContainer{
+	return &wireContainer{
 		typeMapping:  make(map[reflect.Type]dependencySpec),
 		tokenMapping: make(map[string]dependencySpec),
 	}
 }
 
 // SingletonToken implements pkg.Container.
-func (w *WireContainer) SingletonToken(token string, resolver any) error {
+func (w *wireContainer) SingletonToken(token string, resolver any) error {
 	spec, err := newSpec(resolver, SINGLETON, w)
 	if err != nil {
 		return err
@@ -50,7 +32,7 @@ func (w *WireContainer) SingletonToken(token string, resolver any) error {
 }
 
 // TransientToken implements pkg.Container.
-func (w *WireContainer) TransientToken(token string, resolver any) error {
+func (w *wireContainer) TransientToken(token string, resolver any) error {
 	spec, err := newSpec(resolver, TRANSIENT, w)
 	if err != nil {
 		return err
@@ -61,7 +43,7 @@ func (w *WireContainer) TransientToken(token string, resolver any) error {
 }
 
 // Fill implements pkg.Container.
-func (w *WireContainer) Fill(structure any) error {
+func (w *wireContainer) Fill(structure any) error {
 	baseType := reflect.TypeOf(structure)
 	baseValue := reflect.ValueOf(structure)
 	if baseType.Kind() != reflect.Pointer {
@@ -119,7 +101,7 @@ func (w *WireContainer) Fill(structure any) error {
 }
 
 // Resolve implements pkg.Container.
-func (w *WireContainer) Resolve(abstraction any) error {
+func (w *wireContainer) Resolve(abstraction any) error {
 	abstractionVal := reflect.ValueOf(abstraction)
 	if abstractionVal.Kind() != reflect.Pointer {
 		return errors.NewError("abstranction must be a pointer to an interface")
@@ -149,7 +131,7 @@ func (w *WireContainer) Resolve(abstraction any) error {
 }
 
 // ResolveWithToken implements pkg.Container.
-func (w *WireContainer) ResolveToken(token string, abstraction any) error {
+func (w *wireContainer) ResolveToken(token string, abstraction any) error {
 	abstractionVal := reflect.ValueOf(abstraction)
 	if abstractionVal.Kind() != reflect.Pointer {
 		return errors.NewError("abstranction must be a pointer to an interface")
@@ -180,7 +162,7 @@ func (w *WireContainer) ResolveToken(token string, abstraction any) error {
 
 // Singleton sets a resolver for the provided type with a singleton lifecycle. If a previous resolver was set
 // the new one overrides the previous one.
-func (w *WireContainer) Singleton(resolver any) error {
+func (w *wireContainer) Singleton(resolver any) error {
 	// May be here we can check if the resolver is valid
 	spec, err := newSpec(resolver, SINGLETON, w)
 	if err != nil {
@@ -195,7 +177,7 @@ func (w *WireContainer) Singleton(resolver any) error {
 
 // Singleton sets a resolver for the provided type with a transient lifecycle. If a previous resolver was set
 // the new one overrides the previous one.
-func (w *WireContainer) Transient(resolver any) error {
+func (w *wireContainer) Transient(resolver any) error {
 	// May be here we can check if the resolver is valid
 	spec, err := newSpec(resolver, TRANSIENT, w)
 	if err != nil {
@@ -208,7 +190,7 @@ func (w *WireContainer) Transient(resolver any) error {
 	return nil
 }
 
-func (w *WireContainer) getSpecForToken(token string) (dependencySpec, error) {
+func (w *wireContainer) getSpecForToken(token string) (dependencySpec, error) {
 	spec, abstractionDefined := w.tokenMapping[token]
 	if !abstractionDefined {
 		message := fmt.Sprintf("resolver for %s not set", token)
@@ -217,7 +199,7 @@ func (w *WireContainer) getSpecForToken(token string) (dependencySpec, error) {
 	return spec, nil
 }
 
-func (w *WireContainer) getSpec(reflectType reflect.Type) (dependencySpec, error) {
+func (w *wireContainer) getSpec(reflectType reflect.Type) (dependencySpec, error) {
 	spec, abstractionDefined := w.typeMapping[reflectType]
 	if !abstractionDefined {
 		message := fmt.Sprintf("resolver for %s not set", reflectType.String())
@@ -226,7 +208,7 @@ func (w *WireContainer) getSpec(reflectType reflect.Type) (dependencySpec, error
 	return spec, nil
 }
 
-func (w *WireContainer) resolveType(reflectionType reflect.Type) (any, error) {
+func (w *wireContainer) resolveType(reflectionType reflect.Type) (any, error) {
 	spec, exists := w.typeMapping[reflectionType]
 	if !exists {
 		return nil, errors.Errorf("resolver not defined for %s", reflectionType.String())

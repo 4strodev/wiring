@@ -1,6 +1,7 @@
 package pkg
 
 import (
+	"log"
 	"reflect"
 
 	"github.com/4strodev/wiring/pkg/errors"
@@ -33,6 +34,10 @@ func (spec *dependencySpec) Resolve() (any, error) {
 			instance, err := spec.executeResolver()
 			if err != nil {
 				return nil, err
+			}
+			if instance == nil {
+				log.Println("instance is nil!")
+				return nil, errors.NewError("Resolver returned a nil instance")
 			}
 			spec.instance = instance
 		}
@@ -84,7 +89,8 @@ func (spec *dependencySpec) arguments() ([]reflect.Value, error) {
 	return []reflect.Value{}, nil
 }
 
-func newSpec(resolver any, lifeCycle abstractionLifeCycle, container *wireContainer) (spec dependencySpec, err error) {
+func newSpec(resolver any, lifeCycle abstractionLifeCycle, container *wireContainer) (spec *dependencySpec, err error) {
+	spec = new(dependencySpec)
 	spec.lifeCycle = lifeCycle
 	spec.container = container
 

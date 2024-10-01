@@ -9,14 +9,14 @@ import (
 )
 
 type wireContainer struct {
-	typeMapping  map[reflect.Type]dependencySpec
-	tokenMapping map[string]dependencySpec
+	typeMapping  map[reflect.Type]*dependencySpec
+	tokenMapping map[string]*dependencySpec
 }
 
 func New() Container {
 	return &wireContainer{
-		typeMapping:  make(map[reflect.Type]dependencySpec),
-		tokenMapping: make(map[string]dependencySpec),
+		typeMapping:  make(map[reflect.Type]*dependencySpec),
+		tokenMapping: make(map[string]*dependencySpec),
 	}
 }
 
@@ -46,11 +46,7 @@ func (w *wireContainer) TransientToken(token string, resolver any) error {
 func (w *wireContainer) Fill(structure any) error {
 	baseType := reflect.TypeOf(structure)
 	baseValue := reflect.ValueOf(structure)
-	if baseType.Kind() != reflect.Pointer {
-		errors.NewError("fill requires a struct pointer")
-	}
-
-	if baseType.Elem().Kind() != reflect.Struct {
+	if baseType.Kind() != reflect.Pointer || baseType.Elem().Kind() != reflect.Struct {
 		errors.NewError("fill requires a struct pointer")
 	}
 
@@ -61,6 +57,9 @@ func (w *wireContainer) Fill(structure any) error {
 		var instance any
 		var err error
 		fieldType := structType.Field(i)
+		if !fieldType.IsExported() {
+			continue
+		}
 		fieldValue := structValue.Field(i)
 
 		tagValue := fieldType.Tag.Get(WIRE_TAG)
@@ -70,7 +69,7 @@ func (w *wireContainer) Fill(structure any) error {
 		}
 
 		// Handling token resolved strategy
-		var spec dependencySpec
+		var spec *dependencySpec
 		if tagParams[0] != "" {
 			tokenTag := tagParams[0]
 			spec, err := w.getSpecForToken(tokenTag)
@@ -88,6 +87,7 @@ func (w *wireContainer) Fill(structure any) error {
 		// Handling type resolving strategy
 		spec, err = w.getSpec(fieldType.Type)
 		if err != nil {
+			err = errors.Errorf("error resolving field '%s': %w", fieldType.Name, err)
 			return err
 		}
 		instance, err = spec.Resolve()
@@ -106,12 +106,12 @@ func (w *wireContainer) Resolve(abstraction any) error {
 	if abstractionVal.Kind() != reflect.Pointer {
 		return errors.NewError("abstranction must be a pointer to an interface")
 	}
-	abstractionType := abstractionVal.Elem().Type()
-	var instance any
-
 	if !abstractionVal.Elem().CanSet() {
 		return errors.NewError("cannot set value of abstraction")
 	}
+
+	abstractionType := abstractionVal.Elem().Type()
+	var instance any
 
 	spec, err := w.getSpec(abstractionType)
 	if err != nil {
@@ -190,20 +190,20 @@ func (w *wireContainer) Transient(resolver any) error {
 	return nil
 }
 
-func (w *wireContainer) getSpecForToken(token string) (dependencySpec, error) {
+func (w *wireContainer) getSpecForToken(token string) (*dependencySpec, error) {
 	spec, abstractionDefined := w.tokenMapping[token]
 	if !abstractionDefined {
-		message := fmt.Sprintf("resolver for %s not set", token)
-		return dependencySpec{}, errors.NewError(message)
+		message := fmt.Sprintf("resolver for token '%s' not set", token)
+		return &dependencySpec{}, errors.NewError(message)
 	}
 	return spec, nil
 }
 
-func (w *wireContainer) getSpec(reflectType reflect.Type) (dependencySpec, error) {
+func (w *wireContainer) getSpec(reflectType reflect.Type) (*dependencySpec, error) {
 	spec, abstractionDefined := w.typeMapping[reflectType]
 	if !abstractionDefined {
-		message := fmt.Sprintf("resolver for %s not set", reflectType.String())
-		return dependencySpec{}, errors.NewError(message)
+		message := fmt.Sprintf("resolver for type '%s' not set", reflectType.String())
+		return &dependencySpec{}, errors.NewError(message)
 	}
 	return spec, nil
 }

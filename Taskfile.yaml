@@ -12,7 +12,7 @@ tasks:
     desc: Execute tests
     deps:
       - mktmp
-    cmd: go test ./... -v -cover -coverprofile={{ .TMP }}/coverage.out
+    cmd: go test ./... -v -cover -coverprofile={{ .TMP }}/coverage.out {{.CLI_ARGS}}
 
   coverage:
     desc: Shows on the browser the test coverage of the project
@@ -26,7 +26,7 @@ tasks:
 
   docs:
     desc: show documentation as it will be rendered in go pkg site. It requires pkgiste to be installed
-    cmd: pkgsite -open .
+    cmd: pkgsite {{.CLI_ARGS}} .
 
   mktmp:
     desc: Creates default temporary directory for temp files like coverage profile.

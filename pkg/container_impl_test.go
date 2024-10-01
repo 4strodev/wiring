@@ -7,20 +7,35 @@ import (
 	"github.com/stretchr/testify/require"
 )
 
-// The resolver of a singleton should be called just once
-func TestFill(t *testing.T) {
+func InitializeContainer(t *testing.T) Container {
 	var container = New()
 	err := container.Singleton(mocks.Resolver)
 	require.NoError(t, err)
 	err = container.SingletonToken(mocks.TESTING_TOKEN, mocks.TokenResolver)
 	require.NoError(t, err)
+	return container
+}
 
-	var fillableStruct mocks.FillableStruct
-	err = container.Fill(&fillableStruct)
-	require.NoError(t, err)
+// The resolver of a singleton should be called just once
+func TestFill(t *testing.T) {
+	t.Run("should fill a valid struct", func(t *testing.T) {
+		var err error
+		container := InitializeContainer(t)
 
-	// Validate struct fields
-	require.NoError(t, fillableStruct.CheckResolvedFields())
-	require.Equal(t, mocks.TokenResolver(), fillableStruct.TokenResolved)
-	require.Equal(t, mocks.Resolver(), fillableStruct.TypeResolved)
+		var fillableStruct mocks.FillableStruct
+		err = container.Fill(&fillableStruct)
+		require.NoError(t, err)
+
+		// Validate struct fields
+		require.NoError(t, fillableStruct.CheckResolvedFields())
+		require.Equal(t, mocks.TokenResolver(), fillableStruct.TokenResolved)
+		require.Equal(t, mocks.Resolver(), fillableStruct.TypeResolved)
+	})
+	t.Run("should only accept struct pointers", func(t *testing.T) {
+		var err error
+		container := InitializeContainer(t)
+		var nonStructValue int
+		err = container.Fill(&nonStructValue)
+		require.Error(t, err)
+	})
 }

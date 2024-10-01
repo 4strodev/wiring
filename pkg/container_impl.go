@@ -46,8 +46,12 @@ func (w *wireContainer) TransientToken(token string, resolver any) error {
 func (w *wireContainer) Fill(structure any) error {
 	baseType := reflect.TypeOf(structure)
 	baseValue := reflect.ValueOf(structure)
-	if baseType.Kind() != reflect.Pointer || baseType.Elem().Kind() != reflect.Struct {
-		errors.NewError("fill requires a struct pointer")
+	if baseType.Kind() != reflect.Pointer {
+		return errors.NewError("fill requires a struct pointer")
+	}
+
+	if baseType.Elem().Kind() != reflect.Struct {
+		return errors.NewError("fill requires a struct pointer")
 	}
 
 	structType := baseType.Elem()

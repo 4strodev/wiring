@@ -54,6 +54,38 @@ func TestResolve(t *testing.T) {
 		require.NoError(t, err)
 		require.NotNil(t, complexAbstraction)
 	})
+	t.Run("should return error when resolver expects non existing abstraction", func(t *testing.T) {
+		var err error
+		var container = New()
+		err = container.Singleton(func(abstraction mocks.Abstraction) ComplexAbstraction {
+			require.NotNil(t, abstraction)
+			return ComplexImplementation{Abstraction: abstraction}
+		})
+		require.NoError(t, err)
+
+		var complexAbstraction ComplexAbstraction
+		err = container.Resolve(&complexAbstraction)
+		require.Error(t, err)
+	})
+}
+
+func TestResolveToken(t *testing.T) {
+	t.Run("should resolve a dependency by token", func(t *testing.T) {
+		var err error
+		var container = InitializeContainer(t)
+		var value string
+		err = container.ResolveToken(mocks.TESTING_TOKEN, &value)
+		require.NoError(t, err)
+		require.NotZero(t, value)
+	})
+	t.Run("should return error for not defined token", func(t *testing.T) {
+		var err error
+		var container = InitializeContainer(t)
+		var value string
+		err = container.ResolveToken("invalid token", &value)
+		require.Error(t, err)
+		require.Zero(t, value)
+	})
 }
 
 // The resolver of a singleton should be called just once

@@ -156,8 +156,10 @@ func (w *wireContainer) ResolveToken(token string, abstraction any) error {
 		return err
 	}
 
-	if !reflect.TypeOf(instance).Implements(abstractionVal.Type().Elem()) {
-		return errors.NewError(fmt.Sprintf("worng resolver for type %v", abstractionType))
+	if abstractionVal.Type().Elem().Kind() == reflect.Interface {
+		if !reflect.TypeOf(instance).Implements(abstractionVal.Type().Elem()) {
+			return errors.NewError(fmt.Sprintf("worng resolver for type %v", abstractionType))
+		}
 	}
 
 	abstractionVal.Elem().Set(reflect.ValueOf(instance))

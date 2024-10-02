@@ -19,7 +19,7 @@ type Container interface {
 	Resolve(value any) error
 
 	// Token based injection
-	
+
 	// SingletonToken same as Singleton but instead of using the type to identify
 	// the implementation it uses the token
 	SingletonToken(token string, resolver any) error
@@ -32,4 +32,3 @@ type Container interface {
 	// Other container utilities
 	Fill(structure any) error
 }
-

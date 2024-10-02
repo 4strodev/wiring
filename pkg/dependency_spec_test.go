@@ -14,7 +14,7 @@ func TestType(t *testing.T) {
 	require.Equal(t, reflect.TypeFor[mocks.Abstraction](), spec.Type())
 }
 
-func TestResolve(t *testing.T) {
+func TestSpecResolve(t *testing.T) {
 	t.Run("should execute resolver just once on singleton", func(t *testing.T) {
 		var counter = 0
 		resolver := func() mocks.Abstraction {

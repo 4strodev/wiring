@@ -86,7 +86,7 @@ func (spec *dependencySpec) arguments() ([]reflect.Value, error) {
 		}
 		values[i] = reflect.ValueOf(value)
 	}
-	return []reflect.Value{}, nil
+	return values, nil
 }
 
 func newSpec(resolver any, lifeCycle abstractionLifeCycle, container *wireContainer) (spec *dependencySpec, err error) {

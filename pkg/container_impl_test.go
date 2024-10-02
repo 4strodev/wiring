@@ -8,6 +8,14 @@ import (
 	"github.com/stretchr/testify/require"
 )
 
+type ComplexAbstraction interface {
+	mocks.Abstraction
+}
+
+type ComplexImplementation struct {
+	mocks.Abstraction
+}
+
 func InitializeContainer(t *testing.T) Container {
 	var container = New()
 	err := container.Singleton(mocks.Resolver)
@@ -31,6 +39,20 @@ func TestResolve(t *testing.T) {
 		var abstraction mocks.Abstraction
 		err = container.Resolve(abstraction)
 		require.Error(t, err)
+	})
+	t.Run("should execute resolver passing corresponding arguments", func(t *testing.T) {
+		var err error
+		var container = InitializeContainer(t)
+		err = container.Singleton(func(abstraction mocks.Abstraction) ComplexAbstraction {
+			require.NotNil(t, abstraction)
+			return ComplexImplementation{Abstraction: abstraction}
+		})
+		require.NoError(t, err)
+
+		var complexAbstraction ComplexAbstraction
+		err = container.Resolve(&complexAbstraction)
+		require.NoError(t, err)
+		require.NotNil(t, complexAbstraction)
 	})
 }
 

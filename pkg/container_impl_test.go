@@ -2,6 +2,7 @@ package pkg
 
 import (
 	"io"
+	"reflect"
 	"testing"
 
 	"github.com/4strodev/wiring/pkg/internal/mocks"
@@ -23,6 +24,20 @@ func InitializeContainer(t *testing.T) Container {
 	err = container.SingletonToken(mocks.TESTING_TOKEN, mocks.TokenResolver)
 	require.NoError(t, err)
 	return container
+}
+
+func TestHasType(t *testing.T) {
+	container := InitializeContainer(t)
+	require.True(t, container.HasType(reflect.TypeFor[mocks.Abstraction]()))
+	require.False(t, container.HasType(reflect.TypeFor[mocks.Implementation]()))
+	require.False(t, container.HasType(reflect.TypeFor[io.Reader]()))
+	require.False(t, container.HasType(reflect.TypeFor[*mocks.Abstraction]()))
+}
+
+func TestHasToken(t *testing.T) {
+	container := InitializeContainer(t)
+	require.True(t, container.HasToken(mocks.TESTING_TOKEN))
+	require.False(t, container.HasToken("another token"))
 }
 
 func TestResolve(t *testing.T) {
@@ -110,6 +125,14 @@ func TestFill(t *testing.T) {
 		err = container.Fill(&nonStructValue)
 		require.Error(t, err)
 		err = container.Fill(nonStructValue)
+		require.Error(t, err)
+	})
+	t.Run("should return error when a field has an invalid type or token", func(t *testing.T) {
+		var err error
+		container := InitializeContainer(t)
+
+		var fillableStruct mocks.InvalidStruct
+		err = container.Fill(&fillableStruct)
 		require.Error(t, err)
 	})
 }

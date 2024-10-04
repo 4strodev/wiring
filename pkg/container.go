@@ -1,6 +1,8 @@
 // contains the wire implementation of interfaces defined on pkg
 package pkg
 
+import "reflect"
+
 const WIRE_TAG = "wire"
 
 type Container interface {
@@ -31,4 +33,9 @@ type Container interface {
 
 	// Other container utilities
 	Fill(structure any) error
+
+	// Check if the container has a resolver for that type
+	HasType(refType reflect.Type) bool
+	// Check if the container has a resolver for that token
+	HasToken(token string) bool
 }

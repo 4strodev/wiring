@@ -3,6 +3,7 @@ package mocks
 import (
 	"errors"
 	"fmt"
+	"io"
 )
 
 const DEFAULT_MESSAGE = "Hello world"
@@ -36,6 +37,12 @@ func ResolverWithMessage(message string) func() Abstraction {
 			message,
 		}
 	}
+}
+
+type InvalidStruct struct {
+	TokenResolved string      `wire:"token"` // This should be resolved by token
+	TypeResolved  Abstraction // This should be resolved by their type
+	Reader        io.Reader
 }
 
 type FillableStruct struct {

@@ -8,16 +8,28 @@ import (
 	"github.com/4strodev/wiring/pkg/errors"
 )
 
-type wireContainer struct {
-	typeMapping  map[reflect.Type]*dependencySpec
-	tokenMapping map[string]*dependencySpec
-}
-
 func New() Container {
 	return &wireContainer{
 		typeMapping:  make(map[reflect.Type]*dependencySpec),
 		tokenMapping: make(map[string]*dependencySpec),
 	}
+}
+
+type wireContainer struct {
+	typeMapping  map[reflect.Type]*dependencySpec
+	tokenMapping map[string]*dependencySpec
+}
+
+// HasToken implements Container.
+func (w *wireContainer) HasToken(token string) bool {
+	_, ok := w.tokenMapping[token]
+	return ok
+}
+
+// HasType implements Container.
+func (w *wireContainer) HasType(refType reflect.Type) bool {
+	_, ok := w.typeMapping[refType]
+	return ok
 }
 
 // SingletonToken implements pkg.Container.
@@ -126,8 +138,11 @@ func (w *wireContainer) Resolve(abstraction any) error {
 		return err
 	}
 
-	if !reflect.TypeOf(instance).Implements(abstractionVal.Type().Elem()) {
-		return errors.NewError(fmt.Sprintf("worng resolver for type %v", abstractionType))
+	instanceType := reflect.TypeOf(instance)
+	if instanceType.Kind() == reflect.Interface {
+		if !instanceType.Implements(abstractionVal.Type().Elem()) {
+			return errors.NewError(fmt.Sprintf("worng resolver for type %v", abstractionType))
+		}
 	}
 
 	abstractionVal.Elem().Set(reflect.ValueOf(instance))

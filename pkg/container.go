@@ -31,7 +31,9 @@ type Container interface {
 	// Gets the instance associated with the provided token
 	ResolveToken(token string, value any) error
 
-	// Other container utilities
+	// Fill gets a struct pointer and resolves their fields, if the field needs to be resolved by token
+	// you can use the 'wire' tag with the token that is associated with. If the field needs to be ignored
+	// use the ignore param -> wire:",ignore". Unexported fields will be ignored
 	Fill(structure any) error
 
 	// Check if the container has a resolver for that type

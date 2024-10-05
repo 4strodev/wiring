@@ -23,6 +23,6 @@ func TestErrorf(t *testing.T) {
 	t.Run("should wrap errors like fmt.Errorf", func(t *testing.T) {
 		var err = errors.New("internal error")
 		wiringError := Errorf("some unexpected error: %w", err)
-		require.ErrorIs(t, err, wiringError.error)
+		require.ErrorIs(t, wiringError, err)
 	})
 }

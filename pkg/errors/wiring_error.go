@@ -9,6 +9,10 @@ type WiringError struct {
 	error
 }
 
+func (e *WiringError) Unwrap() error {
+	return e.error
+}
+
 func WrapError(err error) *WiringError {
 	wiringError := new(WiringError)
 	wiringError.error = err

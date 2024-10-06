@@ -18,8 +18,8 @@ func (i *Implementation) Greet() {
 }
 
 type StructFill struct {
-	Field string `wire:"ignore"`
-	Impl  Implementation
+	Field string `wire:",ignore"`
+	Impl  Abstraction
 }
 
 func Example() {
@@ -27,25 +27,37 @@ func Example() {
 	container.Singleton(func() (Abstraction, error) {
 		return &Implementation{}, nil
 	})
-	var impl Implementation
-	container.Resolve(&impl)
+	var impl Abstraction
+	err := container.Resolve(&impl)
+	if err != nil {
+		panic(err)
+	}
 	impl.Greet()
 	// Output: Hello world
 }
 
 func ExampleContainer_transient() {
 	var container = wiring.New()
-	container.Transient(func() (Abstraction, error) {
+	err := container.Transient(func() (Abstraction, error) {
 		// The resolver is executed every time the abstraction is resolved
 		fmt.Println("Running resolver")
 		return &Implementation{}, nil
 	})
+	if err != nil {
+		panic(err)
+	}
 	var impl Abstraction
-	container.Resolve(&impl)
+	err = container.Resolve(&impl)
+	if err != nil {
+		panic(err)
+	}
 	impl.Greet()
 
 	var otherImpl Abstraction
-	container.Resolve(&otherImpl)
+	err = container.Resolve(&otherImpl)
+	if err != nil {
+		panic(err)
+	}
 	otherImpl.Greet()
 	// Output:
 	// Running resolver
@@ -56,17 +68,26 @@ func ExampleContainer_transient() {
 
 func ExampleContainer_singleton() {
 	var container = wiring.New()
-	container.Singleton(func() (Abstraction, error) {
-		// The resolver is executed every time the abstraction is resolved
+	err := container.Singleton(func() (Abstraction, error) {
 		fmt.Println("Running resolver")
 		return &Implementation{}, nil
 	})
+	if err != nil {
+		panic(err)
+	}
+
 	var impl Abstraction
-	container.Resolve(&impl)
+	err = container.Resolve(&impl)
+	if err != nil {
+		panic(err)
+	}
 	impl.Greet()
 
 	var otherImpl Abstraction
-	container.Resolve(&otherImpl)
+	err = container.Resolve(&otherImpl)
+	if err != nil {
+		panic(err)
+	}
 	otherImpl.Greet()
 	// Output:
 	// Running resolver
@@ -76,11 +97,17 @@ func ExampleContainer_singleton() {
 
 func ExampleContainer_token() {
 	var container = wiring.New()
-	container.TransientToken("abstraction", func() (Abstraction, error) {
+	err := container.TransientToken("abstraction", func() (Abstraction, error) {
 		return &Implementation{}, nil
 	})
+	if err != nil {
+		panic(err)
+	}
 	var impl Abstraction
-	container.ResolveToken("abstraction", &impl)
+	err = container.ResolveToken("abstraction", &impl)
+	if err != nil {
+		panic(err)
+	}
 	impl.Greet()
 	// Output:
 	// Hello world
@@ -88,11 +115,17 @@ func ExampleContainer_token() {
 
 func ExampleContainer_fill() {
 	var container = wiring.New()
-	container.Transient(func() (Abstraction, error) {
+	err := container.Transient(func() (Abstraction, error) {
 		return &Implementation{}, nil
 	})
+	if err != nil {
+		panic(err)
+	}
 	var impl StructFill
-	container.Fill(&impl)
+	err = container.Fill(&impl)
+	if err != nil {
+		panic(err)
+	}
 	impl.Impl.Greet()
 	// Output: Hello world
 }

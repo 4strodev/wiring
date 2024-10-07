@@ -8,6 +8,10 @@ tasks:
     desc: List available tasks
     cmd: task --list-all
 
+  lint:
+    desc: Lint project
+    cmd: golangci-lint run ./...
+
   test:
     desc: Execute tests
     deps:

@@ -120,6 +120,7 @@ func newSpec(resolver any, lifeCycle abstractionLifeCycle, container *wireContai
 		secondType := resolverType.Out(1)
 		if !secondType.Implements(reflect.TypeFor[error]()) {
 			err = errors.NewError("second return type of resolver is not an error")
+			return
 		}
 	}
 

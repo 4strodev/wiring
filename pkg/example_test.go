@@ -24,11 +24,14 @@ type StructFill struct {
 
 func Example() {
 	var container = wiring.New()
-	container.Singleton(func() (Abstraction, error) {
+	err := container.Singleton(func() (Abstraction, error) {
 		return &Implementation{}, nil
 	})
+	if err != nil {
+		panic(err) 
+	}
 	var impl Abstraction
-	err := container.Resolve(&impl)
+	err = container.Resolve(&impl)
 	if err != nil {
 		panic(err)
 	}

@@ -23,12 +23,13 @@ type StructFill struct {
 }
 
 func Example() {
-	var err error
 	var container = wiring.New()
-	// This should make the lint fail
-	container.Singleton(func() (Abstraction, error) {
+	err := container.Singleton(func() (Abstraction, error) {
 		return &Implementation{}, nil
 	})
+	if err != nil {
+		panic(err) 
+	}
 	var impl Abstraction
 	err = container.Resolve(&impl)
 	if err != nil {

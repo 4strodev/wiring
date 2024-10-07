@@ -20,8 +20,7 @@ type ComplexImplementation struct {
 func InitializeContainer(t *testing.T) Container {
 	var container = New()
 	err := container.Singleton(mocks.Resolver)
-	// this should make tests fail
-	require.Error(t, err)
+	require.NoError(t, err)
 	err = container.SingletonToken(mocks.TESTING_TOKEN, mocks.TokenResolver)
 	require.NoError(t, err)
 	return container

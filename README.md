@@ -1,3 +1,4 @@
+[![go badge](https://pkg.go.dev/badge/github.com/4strodev/wiring.svg)](https://pkg.go.dev/github.com/4strodev/wiring)
 ![lint status badge](https://github.com/4strodev/wiring/actions/workflows/lint.yaml/badge.svg)
 ![test status badge](https://github.com/4strodev/wiring/actions/workflows/test.yaml/badge.svg)
 # Wiring

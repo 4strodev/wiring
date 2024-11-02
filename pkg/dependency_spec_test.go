@@ -2,6 +2,8 @@ package pkg
 
 import (
 	"reflect"
+	"sync"
+	"sync/atomic"
 	"testing"
 
 	"github.com/4strodev/wiring/pkg/internal/mocks"
@@ -60,6 +62,36 @@ func TestSpecResolve(t *testing.T) {
 			require.True(t, ok)
 		}
 		require.Equal(t, 5, counter)
+	})
+	t.Run("should be concurrent save for singleton dependencies", func(t *testing.T) {
+		var waitGroup sync.WaitGroup
+		var counter atomic.Int32
+		resolver := func() mocks.Abstraction {
+			counter.Add(1)
+			return &mocks.Implementation{
+				Message: mocks.DEFAULT_MESSAGE,
+			}
+		}
+		container := New()
+		spec, err := newSpec(resolver, SINGLETON, container.(*wireContainer))
+		require.NoError(t, err)
+		require.NotNil(t, spec)
+
+		for i := 0; i < 5; i++ {
+			waitGroup.Add(1)
+			go func() {
+				defer waitGroup.Done()
+				instance, err := spec.Resolve()
+				require.NoError(t, err)
+				abstraction, ok := instance.(mocks.Abstraction)
+				require.True(t, ok)
+				_, ok = abstraction.(*mocks.Implementation)
+				require.True(t, ok)
+			}()
+		}
+
+		waitGroup.Wait()
+		require.Equal(t, int32(5), counter.Load())
 	})
 }
 

@@ -3,6 +3,7 @@ package pkg
 import (
 	"log"
 	"reflect"
+	"sync"
 
 	"github.com/4strodev/wiring/pkg/errors"
 )
@@ -21,6 +22,7 @@ type dependencySpec struct {
 	resolver   any
 	instance   any
 	returnType reflect.Type
+	mutex      sync.Mutex
 }
 
 func (spec *dependencySpec) Type() reflect.Type {
@@ -31,6 +33,8 @@ func (spec *dependencySpec) Resolve() (any, error) {
 	switch spec.lifeCycle {
 	case SINGLETON:
 		if spec.instance == nil {
+			spec.mutex.Lock()
+			defer spec.mutex.Unlock()
 			instance, err := spec.executeResolver()
 			if err != nil {
 				return nil, err

@@ -1,7 +1,6 @@
 package pkg
 
 import (
-	"log"
 	"reflect"
 	"sync"
 
@@ -32,15 +31,14 @@ func (spec *dependencySpec) Type() reflect.Type {
 func (spec *dependencySpec) Resolve() (any, error) {
 	switch spec.lifeCycle {
 	case SINGLETON:
+		spec.mutex.Lock()
+		defer spec.mutex.Unlock()
 		if spec.instance == nil {
-			spec.mutex.Lock()
-			defer spec.mutex.Unlock()
 			instance, err := spec.executeResolver()
 			if err != nil {
 				return nil, err
 			}
 			if instance == nil {
-				log.Println("instance is nil!")
 				return nil, errors.NewError("Resolver returned a nil instance")
 			}
 			spec.instance = instance

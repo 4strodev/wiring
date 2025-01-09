@@ -91,7 +91,7 @@ func TestSpecResolve(t *testing.T) {
 		}
 
 		waitGroup.Wait()
-		require.Equal(t, int32(5), counter.Load())
+		require.Equal(t, int32(1), counter.Load())
 	})
 }
 

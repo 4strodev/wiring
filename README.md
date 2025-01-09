@@ -69,8 +69,8 @@ func main() {
 ## Extended containers
 The `extended` package contains extensions for containers:
 
-- **Derived**: A derived container allows you to create containers that inherits resolvers from parent containers. Allowing you to use container for
-  short living contexts like an http request.
+- **Derived**: A derived container allows you to create containers that inherits resolvers from parent containers. This is a fully functional container which can has their own and *Scoped 🚀* dependencies.
+  Allowing you to use container for short living contexts like an http request.
 - **Must**: An interface that instead of returning errors panics.
 
 ## Token based

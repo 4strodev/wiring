@@ -76,6 +76,44 @@ The `extended` package contains extensions for containers:
 Token based dependencies allows you to specify dependencies using a custom token. These are performant, because they are not relying in reflection (at all), and allows you to have
 multiple dependencies of the same type but with different tokens.
 
+### Ej. Resolving a dependency
+```go
+package main
+
+import (
+	"fmt"
+
+	wiring "github.com/4strodev/wiring/pkg"
+)
+
+type Abstraction interface {
+	Greet()
+}
+
+type Implementation struct {
+}
+
+func (i *Implementation) Greet() {
+	fmt.Println("Hello world")
+}
+
+func main() {
+	var container = wiring.New()
+	err := container.TransientToken("abstraction", func() (Abstraction, error) {
+		return &Implementation{}, nil
+	})
+	if err != nil {
+		panic(err)
+	}
+	var impl Abstraction
+	err = container.ResolveToken("abstraction", &impl)
+	if err != nil {
+		panic(err)
+	}
+	impl.Greet()
+}
+```
+
 ## Struct filling
 Do you have massive dependencies? No problem define a struct with exported fields and let the container fill your struct with the dependencies you need.
 ```go

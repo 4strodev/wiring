@@ -22,8 +22,7 @@ There are two kind of lifecycles
 - **Transient**: Those are dependencies that are always instantiated every time they are resolved.
 - **Scoped**: For scoped dependencies take a look to the `extended` package.
 
-Ej.
-### Resolve a dependency
+### Ej. Resolve a dependency
 ```go
 package main
 

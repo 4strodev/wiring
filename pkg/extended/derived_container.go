@@ -5,8 +5,11 @@ import (
 	"reflect"
 )
 
+// DerivedContainer allows you to create containers that inherits resolvers from parent containers.
+// This is a fully functional container which can has their own and Scoped 🚀 dependencies.
+// Allowing you to use container for short living contexts like an http request.
 type DerivedContainer struct {
-	parent    pkg.Container
+	parent pkg.Container
 	pkg.Container
 }
 

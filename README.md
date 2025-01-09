@@ -20,6 +20,7 @@ There are two kind of lifecycles
 - **Singleton**: These dependencies are instantiated once and then the instance is cached for future resolves.
   - The default implementation is **🧵 concurrently safe**.
 - **Transient**: Those are dependencies that are always instantiated every time they are resolved.
+- **Scoped**: For scoped dependencies take a look to the `extended` package.
 
 Ej.
 ### Resolve a dependency

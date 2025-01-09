@@ -1,2 +1,2 @@
-// extended contains container extensions like Nested or Must
+// extended contains container extensions like [DerivedContainer] or [MustContainer]
 package extended

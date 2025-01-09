@@ -16,8 +16,8 @@ func New() Container {
 }
 
 type wireContainer struct {
-	typeMapping  map[reflect.Type]*dependencySpec
-	tokenMapping map[string]*dependencySpec
+	typeMapping  typeMap
+	tokenMapping tokenMap
 }
 
 // HasToken implements Container.

@@ -4,10 +4,9 @@ import (
 	"reflect"
 )
 
-// MustContainer is a container which instead of returing errors it panicks
+// MustContainer is a container which instead of returing errors it panics
 // use it for prototyping or in circumstances where you know that resolvers
 // are extremerly well configured.
-// This is for a shortcut
 type MustContainer interface {
 	// Type based injection
 

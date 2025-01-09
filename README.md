@@ -27,30 +27,30 @@ Ej.
 package main
 
 import (
-    "fmt"
-    wiring "github.com/4strodev/wiring/pkg"
+    	"fmt"
+    	wiring "github.com/4strodev/wiring/pkg"
 )
 
 type Abstraction interface {
-    Greet()
+    	Greet()
 }
 
 type Implementation struct {
 }
 
 func (i *Implementation) Greet() {
-    fmt.Println("Hello world")
+    	fmt.Println("Hello world")
 }
 
 func main() {
 	var container = wiring.New()
 	container.Singleton(func() (Abstraction, error) {
-        // This resolver is executed just once
+        	// This resolver is executed just once
 		fmt.Println("Running resolver")
 		return &Implementation{}, nil
 	})
 
-    // Resolving dependency
+    	// Resolving dependency
 	var impl Abstraction
 	container.Resolve(&impl)
 	impl.Greet()
@@ -82,51 +82,51 @@ Do you have massive dependencies? No problem define a struct with exported field
 package main
 
 import (
-    "fmt"
-    "log"
+    	"fmt"
+    	"log"
 
-    wiring "github.com/4strodev/wiring/pkg"
+    	wiring "github.com/4strodev/wiring/pkg"
 )
 
 type Abstraction interface {
-    Greet()
+    	Greet()
 }
 
 type Implementation struct {
 }
 
 func (i *Implementation) Greet() {
-    fmt.Println("Hello world")
+    	fmt.Println("Hello world")
 }
 
 type FillableStruct struct {
-    Greeter         Abstraction // if no tag is specified it is resolved by type
-    TokenBased      Abstraction `wire:"token"`
-    IgnoredReader   io.Reader   `wire:",ignore"`
-    ignoredField    string
+    	Greeter         Abstraction // if no tag is specified it is resolved by type
+    	TokenBased      Abstraction `wire:"token"`
+    	IgnoredReader   io.Reader   `wire:",ignore"`
+    	ignoredField    string
 
 }
 
 func main() {
 	var container = wiring.New()
 	container.Singleton(func() (Abstraction, error) {
-        // This resolver is executed just once
+        	// This resolver is executed just once
 		return &Implementation{}, nil
 	})
 
 	container.SingletonToken("token", func() (Abstraction, error) {
-        // This resolver is executed just once
+        	// This resolver is executed just once
 		return &Implementation{}, nil
 	})
 
-    var fillable FillableStruct
-    err := container.Fill(&fillable)
-    if err != nil {
-        log.Fatal(err)
-    }
+    	var fillable FillableStruct
+    	err := container.Fill(&fillable)
+    	if err != nil {
+		log.Fatal(err)
+    	}
 
-    fillable.Greeter.Greet()
-    fillable.TokenBased.Greet()
+    	fillable.Greeter.Greet()
+    	fillable.TokenBased.Greet()
 }
 ```
 

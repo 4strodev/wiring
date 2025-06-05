@@ -1,6 +1,6 @@
 ## Deprecated
 If anyone uses this library I have to tell you that is going to be deprecated. It lacks a set of basic functionalities
-and the implementation is not well designed. I started a new implementation [here](github.com/4strodev/wiring-graphs).
+and the implementation is not well designed. I started a new implementation [here](https://github.com/4strodev/wiring-graphs).
 
 [![go badge](https://pkg.go.dev/badge/github.com/4strodev/wiring.svg)](https://pkg.go.dev/github.com/4strodev/wiring)
 ![lint status badge](https://github.com/4strodev/wiring/actions/workflows/lint.yaml/badge.svg)
